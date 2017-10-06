@@ -111,7 +111,6 @@ while (count<=iter_max)%&&(error~=error_max)%&&(error_max>error+10)%3*NP/2) %&&(
                     pob_aux(i,j)=trial(1,j-1); % Auxiliar pop is used to avoid changes of pop until the whole next population is created
                 end
                 pob_aux(i,1)=error_trial;
-                radio_aux=r_trial;
             else
                 for j=1:(D+1)
                     pob_aux(i,j)=population(i,j);
@@ -123,7 +122,6 @@ while (count<=iter_max)%&&(error~=error_max)%&&(error_max>error+10)%3*NP/2) %&&(
                     pob_aux(i,j)=trial(1,j-1);
                 end
                 pob_aux(i,1)=error_trial;
-                radio_aux=r_trial;
             else
                 for j=1:(D+1) 
                     pob_aux(i,j)=population(i,j); 

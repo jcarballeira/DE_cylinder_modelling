@@ -2,7 +2,7 @@ function [Solution]=Cyl_modelling
 
 clc 
 %hole1:
-center=[-0.31 -0.45 1.50];
+%center=[-0.31 -0.45 1.50];
 %hole2:
 %center=[-0.67 -0.03 1.53];
 %hole3:
@@ -16,9 +16,9 @@ center=[-0.31 -0.45 1.50];
 %hole7:
 %center=[-0.05 -0.63 1.55];
 %hole8:
-%center=[0.63 -0.64 1.55];
+center=[0.63 -0.64 1.55];
 
-nube = pcread('hole1.pcd');
+nube = pcread('hole8.pcd');
 pcshow(nube, 'MarkerSize', 25)
   xlabel('X')
   ylabel('Y')
@@ -118,31 +118,29 @@ Solution.best_estimate(simul,:)=bestmem(2:(D+1));
 Solution.error(simul)=error;
 
 %Calculate radius from best candidate
-sum=0;
-fin=ptCloud.Count;
-for j=1:fin
+size=ptCloud.Count;
+for j=1:size
         x=ptCloud.Location(j);
-        y=ptCloud.Location(fin+j);
-        z=ptCloud.Location(2*fin+j);
+        y=ptCloud.Location(size+j);
+        z=ptCloud.Location(2*size+j);
 
-        Sx=x-Solution.best_estimate(1);
-        Sy=y-Solution.best_estimate(2);
-        Sz=z-Solution.best_estimate(3);
+        Sx=x-Solution.bestmem(2);
+        Sy=y-Solution.bestmem(3);
+        Sz=z-Solution.bestmem(4);
 
-        mod_qpxu=sqrt((Sy*Solution.best_estimate(6)-Sz*Solution.best_estimate(5))^2+(Sz*Solution.best_estimate(4)-Sx*Solution.best_estimate(6))^2+(Sx*Solution.best_estimate(5)-Sy*Solution.best_estimate(4))^2);
-        mod_u=sqrt(Solution.best_estimate(4)^2+Solution.best_estimate(5)^2+Solution.best_estimate(6)^2);
+        mod_qpxu=sqrt((Sy*Solution.bestmem(7)-Sz*Solution.bestmem(6))^2+(Sz*Solution.bestmem(5)-Sx*Solution.bestmem(7))^2+(Sx*Solution.bestmem(6)-Sy*Solution.bestmem(5))^2);
+        mod_u=sqrt(Solution.bestmem(5)^2+Solution.bestmem(6)^2+Solution.bestmem(7)^2);
         temp=mod_qpxu/mod_u;
         sum=sum+temp;
 end
-radio=sum/fin;
+radio=sum/size;
 
 end
 
 %--------------------------------------------------------------------------
 % Representation of results
-height=ptCloud.ZLimits(2)-ptCloud.ZLimits(1);
-params=[Solution.best_estimate(1),Solution.best_estimate(2),Solution.best_estimate(3),Solution.best_estimate(1)+height*Solution.best_estimate(4),Solution.best_estimate(2)+height*Solution.best_estimate(5),Solution.best_estimate(3)+height*Solution.best_estimate(6),radio];
+params=[Solution.bestmem(2),Solution.bestmem(2),center(3),center(1)+height*];
 model = cylinderModel(params);
-%quiver3(Solution.best_estimate(2),Solution.best_estimate(3),Solution.best_estimate(4),Solution.best_estimate(5),Solution.best_estimate(6),Solution.best_estimate(7))
-plot(model)
+quiver3(Solution.bestmem(2),Solution.bestmem(3),Solution.bestmem(4),Solution.bestmem(5),Solution.bestmem(6),Solution.bestmem(7))
+
 end
