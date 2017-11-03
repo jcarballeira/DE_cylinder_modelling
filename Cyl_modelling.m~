@@ -8,10 +8,10 @@ holes=size(holes_dir,1);
 centers=csvread('centers.csv');
 
 for i=1:holes
-center=centers(i,:)
+center=centers(i,:);
 
 cloudfile=strcat('hole', num2str(i));
-cloudfile=strcat(cloudfile, '.pcd')
+cloudfile=strcat(cloudfile, '.pcd');
 
 nube = pcread(cloudfile);
 pcshow(nube, 'MarkerSize', 25)
@@ -140,5 +140,4 @@ params=[Solution.best_estimate(1),Solution.best_estimate(2),Solution.best_estima
 model = cylinderModel(params);
 %quiver3(Solution.best_estimate(2),Solution.best_estimate(3),Solution.best_estimate(4),Solution.best_estimate(5),Solution.best_estimate(6),Solution.best_estimate(7))
 plot(model)
-end
 end
