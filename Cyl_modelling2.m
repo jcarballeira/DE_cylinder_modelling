@@ -1,11 +1,24 @@
-function [Solution]=Cyl_modelling
+function [Solution]=Cyl_modelling2
 
 clc
 
 path='/home/jcl/Matlab2017b/DE_cylinder_modelling';
 holes_dir=dir([path '/*.pcd']);
 holes=size(holes_dir,1)
-centers=csvread('centers.csv')
+
+%Plot each hole cloud
+for i=1:holes
+    
+cloudfile=strcat('roi', num2str(i));
+cloudfile=strcat(cloudfile, '.pcd');
+
+nube = pcread(cloudfile);
+pcshow(nube, 'MarkerSize', 25)
+  xlabel('X')
+  ylabel('Y')
+  zlabel('Z')
+hold on 
+end
 
 
 NP=input('\ \n Introduce population number: \n');
@@ -34,29 +47,25 @@ end
 %    4) Random Mutation, with Thresholding and Discarding, NP is
 %    drastically reduced (tracking) after convergence.
 version_de=input('\ \n Introduce the DE version that you want to apply: \n 1) Random Mutation, with Thresholding and Discarding. \n 2) Basic version, Random Mutation, without Thresholding, Discarding. \n 3) Mutation from Best candidate, with Thresholding and Discarding. \n 4) Random Mutation, with Thresholding and Discarding, NP reduced (tracking) after convergence. \n');
-if isempty(version_de),
+if isempty(version_de)
     version_de=1;   
     fprintf(1,'\n \t Option 1 by default. \n');
 end
 
+centers=csvread('centers.csv');
 
+%Evaluate each hole cloud
 for i=1:holes
     
 center=centers(i,:)
 
-cloudfile=strcat('hole', num2str(i));
+cloudfile=strcat('roi', num2str(i));
 cloudfile=strcat(cloudfile, '.pcd')
 
-nube = pcread(cloudfile);
-pcshow(nube, 'MarkerSize', 25)
-  xlabel('X')
-  ylabel('Y')
-  zlabel('Z')
-hold on 
-
+nube = pcread(cloudfile);    
 Points=nube.Count;
 
-if Points > 10
+if Points > 5
 
    
 
@@ -78,7 +87,7 @@ ptCloud=pointCloud(mat);
 
 %--------------------------------------------------------------------------
 %Initialization parameters:
-D=6;                        % DE Number of Chromosomes. 
+D=7;                        % DE Number of Chromosomes. 
 F=0.8;                     % Differential variations factor (mutation)
 CR=0.5;                     % Crossover constant
 
@@ -87,8 +96,8 @@ CR=0.5;                     % Crossover constant
 vector_min=[-0.4 -0.4 0.6];
 %vector_max=[1 1 1 ];
 vector_max=[0.4 0.4 1];
-min=[center(1)-0.05, center(2)-0.05, ptCloud.ZLimits(1)-0.01, vector_min(1), vector_min(2), vector_min(3)] %minimum an maximum
-max=[center(1)+0.05, center(2)+0.05, ptCloud.ZLimits(1)+0.01, vector_max(1), vector_max(2), vector_max(3)]
+min=[center(1)-0.05, center(2)-0.05, ptCloud.ZLimits(1)-0.01, vector_min(1), vector_min(2), vector_min(3),0.001]; %minimum an maximum
+max=[center(1)+0.05, center(2)+0.05, ptCloud.ZLimits(1)+0.01, vector_max(1), vector_max(2), vector_max(3),0.03];
 
 N_SIMULATIONS=1;
 Solution.best_estimate=zeros(N_SIMULATIONS,D);
@@ -109,40 +118,22 @@ population=initiate_pop(min,max,NP,D);
 fprintf(1,'\n Simulation: %d/%d ',simul,N_SIMULATIONS);
 tic
 % The DE-based GL filter is called
-[bestmem,error,population]=alg_genet(ptCloud,version_de,population,iter_max,max,min,NP,D,F,CR);
+[bestmem,error,population]=alg_genet2(ptCloud,version_de,population,iter_max,max,min,NP,D,F,CR);
 toc
 fprintf(1,'\n Estimated center by the GL filter (x y z) %f %f %f %f\n',bestmem(2),bestmem(3),bestmem(4));
 fprintf(1,'\n Estimated axis vector by the GL filter (u v w) %f %f %f %f\n',bestmem(5),bestmem(6),bestmem(7));
+fprintf(1,'\n Estimated Radius %f\n',bestmem(8));
 
 % The best solution and the error are returned.
 Solution.best_estimate(simul,:)=bestmem(2:(D+1));
 Solution.error(simul)=error;
-
-%Calculate radius from best candidate
-sum=0;
-fin=ptCloud.Count;
-for j=1:fin
-        x=ptCloud.Location(j);
-        y=ptCloud.Location(fin+j);
-        z=ptCloud.Location(2*fin+j);
-
-        Sx=x-Solution.best_estimate(1);
-        Sy=y-Solution.best_estimate(2);
-        Sz=z-Solution.best_estimate(3);
-
-        mod_qpxu=sqrt((Sy*Solution.best_estimate(6)-Sz*Solution.best_estimate(5))^2+(Sz*Solution.best_estimate(4)-Sx*Solution.best_estimate(6))^2+(Sx*Solution.best_estimate(5)-Sy*Solution.best_estimate(4))^2);
-        mod_u=sqrt(Solution.best_estimate(4)^2+Solution.best_estimate(5)^2+Solution.best_estimate(6)^2);
-        temp=mod_qpxu/mod_u;
-        sum=sum+temp;
-end
-radio=sum/fin;
 
 end
 
 %--------------------------------------------------------------------------
 % Representation of results
 height=ptCloud.ZLimits(2)-ptCloud.ZLimits(1);
-params=[Solution.best_estimate(1),Solution.best_estimate(2),Solution.best_estimate(3),Solution.best_estimate(1)+height*Solution.best_estimate(4),Solution.best_estimate(2)+height*Solution.best_estimate(5),Solution.best_estimate(3)+height*Solution.best_estimate(6),radio];
+params=[Solution.best_estimate(1),Solution.best_estimate(2),Solution.best_estimate(3),Solution.best_estimate(1)+height*Solution.best_estimate(4),Solution.best_estimate(2)+height*Solution.best_estimate(5),Solution.best_estimate(3)+height*Solution.best_estimate(6),Solution.best_estimate(7)];
 model = cylinderModel(params);
 %quiver3(Solution.best_estimate(2),Solution.best_estimate(3),Solution.best_estimate(4),Solution.best_estimate(5),Solution.best_estimate(6),Solution.best_estimate(7))
 plot(model)

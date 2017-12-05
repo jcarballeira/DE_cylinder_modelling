@@ -1,4 +1,4 @@
-function [error]=fitness1(ptCloud,trial,center)
+function [error]=fitness2(ptCloud,trial)
 %--------------------------------------------------------------------------
 %   Function: fitness
 % -> Description: fitness function that is optimized by the DE-based Global
@@ -9,6 +9,7 @@ function [error]=fitness1(ptCloud,trial,center)
 % -> Output: 
 %       -error: fitness value.
 %--------------------------------------------------------------------------
+
 sum_desv=0;
 size=ptCloud.Count;
 dists=zeros(1,size);
@@ -19,14 +20,14 @@ dists=zeros(1,size);
         y=ptCloud.Location(size+j);
         z=ptCloud.Location(2*size+j);
 
-        Sx=x-center(1);
-        Sy=y-center(2);
-        Sz=z-center(3);
+        Sx=x-trial(1);
+        Sy=y-trial(2);
+        Sz=z-trial(3);
 
-        mod_qpxu=sqrt((Sy*trial(3)-Sz*trial(2))^2+(Sz*trial(1)-Sx*trial(3))^2+(Sx*trial(2)-Sy*trial(1))^2);
-        mod_u=sqrt(trial(1)^2+trial(2)^2+trial(3)^2);
+        mod_qpxu=sqrt((Sy*trial(6)-Sz*trial(5))^2+(Sz*trial(4)-Sx*trial(6))^2+(Sx*trial(5)-Sy*trial(4))^2);
+        mod_u=sqrt(trial(4)^2+trial(5)^2+trial(6)^2);
         dist_rect=mod_qpxu/mod_u;
-        dists(j)=dist_rect-trial(4);
+        dists(j)=dist_rect-trial(7);
      end
 
    

@@ -1,4 +1,4 @@
-function [error]=fitness1(ptCloud,trial,center)
+function avg=ev(ptCloud,vector,center,radius)
 %--------------------------------------------------------------------------
 %   Function: fitness
 % -> Description: fitness function that is optimized by the DE-based Global
@@ -9,11 +9,9 @@ function [error]=fitness1(ptCloud,trial,center)
 % -> Output: 
 %       -error: fitness value.
 %--------------------------------------------------------------------------
-sum_desv=0;
+double sum=0;
 size=ptCloud.Count;
 dists=zeros(1,size);
-
-
     for j=1:size
         x=ptCloud.Location(j);
         y=ptCloud.Location(size+j);
@@ -23,20 +21,12 @@ dists=zeros(1,size);
         Sy=y-center(2);
         Sz=z-center(3);
 
-        mod_qpxu=sqrt((Sy*trial(3)-Sz*trial(2))^2+(Sz*trial(1)-Sx*trial(3))^2+(Sx*trial(2)-Sy*trial(1))^2);
-        mod_u=sqrt(trial(1)^2+trial(2)^2+trial(3)^2);
-        dist_rect=mod_qpxu/mod_u;
-        dists(j)=dist_rect-trial(4);
-     end
-
-   
-
-    for j=1:size
-        desv=dists(j)^2;
-        sum_desv=sum_desv + desv;
+        mod_qpxu=sqrt((Sy*vector(3)-Sz*vector(2))^2+(Sz*vector(1)-Sx*vector(3))^2+(Sx*vector(2)-Sy*vector(1))^2);
+        mod_u=sqrt(vector(1)^2+vector(2)^2+vector(3)^2);
+        temp=mod_qpxu/mod_u;
+        dist=abs(temp-radius);
+        dists(j)=dist;
+        
     end
-
-    desvest=sqrt(sum_desv/size);
-    error=desvest;
+    avg=mean(dists);
 end
-
