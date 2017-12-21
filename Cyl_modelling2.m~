@@ -9,7 +9,7 @@ holes=size(holes_dir,1)
 %Plot each hole cloud
 for i=1:holes
     
-cloudfile=strcat('roi', num2str(i));
+cloudfile=strcat('hole', num2str(i));
 cloudfile=strcat(cloudfile, '.pcd');
 
 nube = pcread(cloudfile);

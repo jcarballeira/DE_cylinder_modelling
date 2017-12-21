@@ -17,17 +17,33 @@ pcshow(nube, 'MarkerSize', 25)
   ylabel('Y')
   zlabel('Z')
 hold on  
-maxDistance = 0.010;
-[model,inlierIndices] = pcfitcylinder(nube,maxDistance);
-model
+
+xyz=nube.Location;
+xyz=reshape(xyz, [1 size(xyz,1)*size(xyz,2)]);
+xyz(isnan(xyz))=[];
+sz=size(xyz,2);
+   
+for j=1:1:sz/3
+       x=xyz(j);
+       y=xyz(j+sz/3);
+       z=xyz(j+2*sz/3);
+       mat(ceil(j),:) = [x y z];
+end
+
+ptCloud=pointCloud(mat);
+
+maxDistance = 0.030;
+[model,inlierIndices] = pcfitcylinder(ptCloud,maxDistance);
+
 plot(model)
 center=model.Parameters(1:3);
 vector=model.Orientation;
-avg=ev(nube,vector,center,model.Radius);
+avg=ev(ptCloud,vector,center,model.Radius);
 
-fprintf(1,'\n Estimated axis vector by the GL filter (u v w): [ %f, %f, %f', vector(1), vector(2), vector(3));
-fprintf(1,'\n Estimated Radius by the GL filter %f\n',model.Radius);
-fprintf(1,'\n Average distance: %f \n',avg);
+fprintf(1,'\n Estimated hole entrance center [ %f, %f, %f]', center(1), center(2), center(3));
+fprintf(1,'\n Estimated axis vector by the GL filter (u v w): [ %f, %f, %f]', vector(1), vector(2), vector(3));
+fprintf(1,'\n Estimated Radius by the GL filter %f cms\n',model.Radius*100);
+fprintf(1,'\n Average distance: %f cms\n',avg*100);
 end
 
 % for i=1:holes
