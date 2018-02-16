@@ -57,7 +57,7 @@ centers=csvread('centers.csv');
 %Evaluate each hole cloud
 for i=1:holes
     
-center=centers(i,:)
+center=centers(i,:);
 
 cloudfile=strcat('roi', num2str(i));
 cloudfile=strcat(cloudfile, '.pcd')
@@ -66,9 +66,7 @@ nube = pcread(cloudfile);
 Points=nube.Count;
 
 if Points > 5
-
-   
-
+    
 fprintf(1,'\n Hole points considered: %i \n',Points);    
 xyz=nube.Location;
 xyz=reshape(xyz, [1 size(xyz,1)*size(xyz,2)]);
@@ -96,8 +94,8 @@ CR=0.5;                     % Crossover constant
 vector_min=[-0.4 -0.4 0.6];
 %vector_max=[1 1 1 ];
 vector_max=[0.4 0.4 1];
-min=[center(1)-0.05, center(2)-0.05, ptCloud.ZLimits(1)-0.01, vector_min(1), vector_min(2), vector_min(3),0.001]; %minimum an maximum
-max=[center(1)+0.05, center(2)+0.05, ptCloud.ZLimits(1)+0.01, vector_max(1), vector_max(2), vector_max(3),0.04];
+min=[center(1)-0.05, center(2)-0.05, ptCloud.ZLimits(1)-0.01, vector_min(1), vector_min(2), vector_min(3),0.01]; %minimum an maximum
+max=[center(1)+0.05, center(2)+0.05, ptCloud.ZLimits(1)+0.01, vector_max(1), vector_max(2), vector_max(3),0.025];
 
 N_SIMULATIONS=1;
 Solution.best_estimate=zeros(N_SIMULATIONS,D);
@@ -127,8 +125,8 @@ radius=bestmem(8);
 
 avg=ev(ptCloud,vector,center,radius);
 
-fprintf(1,'\n Estimated center by the GL filter (x y z) %f %f %f %f\n',bestmem(2),bestmem(3),bestmem(4));
-fprintf(1,'\n Estimated axis vector by the GL filter (u v w) %f %f %f %f\n',bestmem(5),bestmem(6),bestmem(7));
+fprintf(1,'\n Estimated center by the GL filter (x, y, z) %f, %f, %f\n',bestmem(2),bestmem(3),bestmem(4));
+fprintf(1,'\n Estimated axis vector by the GL filter (u, v, w) %f, %f, %f\n',bestmem(5),bestmem(6),bestmem(7));
 fprintf(1,'\n Estimated Radius %f cms\n',bestmem(8)*100);
 fprintf(1,'\n Average distance: %f cms \n',avg*100);
 
@@ -144,7 +142,10 @@ height=ptCloud.ZLimits(2)-ptCloud.ZLimits(1);
 params=[Solution.best_estimate(1),Solution.best_estimate(2),Solution.best_estimate(3),Solution.best_estimate(1)+height*Solution.best_estimate(4),Solution.best_estimate(2)+height*Solution.best_estimate(5),Solution.best_estimate(3)+height*Solution.best_estimate(6),Solution.best_estimate(7)];
 model = cylinderModel(params);
 %quiver3(Solution.best_estimate(2),Solution.best_estimate(3),Solution.best_estimate(4),Solution.best_estimate(5),Solution.best_estimate(6),Solution.best_estimate(7))
-plot(model)
+if avg*100<3
+    plot(model)
+else
+end    
 else 
 fprintf(1,'\n More points needed to analyze the hole');    
 end
