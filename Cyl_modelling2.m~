@@ -94,8 +94,8 @@ CR=0.5;                     % Crossover constant
 vector_min=[-0.4 -0.4 0.6];
 %vector_max=[1 1 1 ];
 vector_max=[0.4 0.4 1];
-min=[center(1)-0.05, center(2)-0.05, ptCloud.ZLimits(1)-0.01, vector_min(1), vector_min(2), vector_min(3),0.001]; %minimum an maximum
-max=[center(1)+0.05, center(2)+0.05, ptCloud.ZLimits(1)+0.01, vector_max(1), vector_max(2), vector_max(3),0.04];
+min=[center(1)-0.015, center(2)-0.015, ptCloud.ZLimits(1)-0.01, vector_min(1), vector_min(2), vector_min(3),0.01]; %minimum an maximum
+max=[center(1)+0.015, center(2)+0.015, ptCloud.ZLimits(1)+0.01, vector_max(1), vector_max(2), vector_max(3),0.02];
 
 N_SIMULATIONS=1;
 Solution.best_estimate=zeros(N_SIMULATIONS,D);
@@ -142,7 +142,7 @@ height=ptCloud.ZLimits(2)-ptCloud.ZLimits(1);
 params=[Solution.best_estimate(1),Solution.best_estimate(2),Solution.best_estimate(3),Solution.best_estimate(1)+height*Solution.best_estimate(4),Solution.best_estimate(2)+height*Solution.best_estimate(5),Solution.best_estimate(3)+height*Solution.best_estimate(6),Solution.best_estimate(7)];
 model = cylinderModel(params);
 %quiver3(Solution.best_estimate(2),Solution.best_estimate(3),Solution.best_estimate(4),Solution.best_estimate(5),Solution.best_estimate(6),Solution.best_estimate(7))
-if avg*100<3
+if avg*100<
     plot(model)
 else
 end    

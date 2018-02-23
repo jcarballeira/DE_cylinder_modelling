@@ -57,7 +57,7 @@ centers=csvread('centers.csv');
 %Evaluate each hole cloud
 for i=1:holes
     
-center=centers(i,:);
+center=centers(i,:)
 
 cloudfile=strcat('roi', num2str(i));
 cloudfile=strcat(cloudfile, '.pcd')
@@ -94,8 +94,8 @@ CR=0.5;                     % Crossover constant
 vector_min=[-0.4 -0.4 0.6];
 %vector_max=[1 1 1 ];
 vector_max=[0.4 0.4 1];
-min=[center(1)-0.05, center(2)-0.05, ptCloud.ZLimits(1)-0.01, vector_min(1), vector_min(2), vector_min(3),0.01]; %minimum an maximum
-max=[center(1)+0.05, center(2)+0.05, ptCloud.ZLimits(1)+0.01, vector_max(1), vector_max(2), vector_max(3),0.025];
+min=[center(1)-0.01, center(2)-0.01, ptCloud.ZLimits(1), vector_min(1), vector_min(2), vector_min(3),0.01]; %minimum an maximum
+max=[center(1)+0.01, center(2)+0.01, ptCloud.ZLimits(1), vector_max(1), vector_max(2), vector_max(3),0.025];
 
 N_SIMULATIONS=1;
 Solution.best_estimate=zeros(N_SIMULATIONS,D);
