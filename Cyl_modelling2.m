@@ -94,8 +94,8 @@ CR=0.5;                     % Crossover constant
 vector_min=[-0.4 -0.4 0.6];
 %vector_max=[1 1 1 ];
 vector_max=[0.4 0.4 1];
-min=[center(1)-0.01, center(2)-0.01, ptCloud.ZLimits(1), vector_min(1), vector_min(2), vector_min(3),0.01]; %minimum an maximum
-max=[center(1)+0.01, center(2)+0.01, ptCloud.ZLimits(1), vector_max(1), vector_max(2), vector_max(3),0.025];
+min=[center(1)-0.05, center(2)-0.05, ptCloud.ZLimits(1)-0.01, vector_min(1), vector_min(2), vector_min(3),0.0125]; %minimum an maximum
+max=[center(1)+0.05, center(2)+0.05, ptCloud.ZLimits(1)+0.01, vector_max(1), vector_max(2), vector_max(3),0.03];
 
 N_SIMULATIONS=1;
 Solution.best_estimate=zeros(N_SIMULATIONS,D);
@@ -127,8 +127,12 @@ avg=ev(ptCloud,vector,center,radius);
 
 fprintf(1,'\n Estimated center by the GL filter (x, y, z) %f, %f, %f\n',bestmem(2),bestmem(3),bestmem(4));
 fprintf(1,'\n Estimated axis vector by the GL filter (u, v, w) %f, %f, %f\n',bestmem(5),bestmem(6),bestmem(7));
-fprintf(1,'\n Estimated Radius %f cms\n',bestmem(8)*100);
-fprintf(1,'\n Average distance: %f cms \n',avg*100);
+u=[0 0 1];
+angle_deg = atan2d(norm(cross(u,vector)),dot(u,vector));
+fprintf(1,'\n Angle with sensor: %f deg \n',angle_deg);
+fprintf(1,'\n Radius %f cms\n',bestmem(8)*100);
+fprintf(1,'\n Error Radius: %f cms\n',abs(bestmem(8)*100-1.75));
+fprintf(1,'\n Avg. Distance from cloud to cylinder: %f cms \n',avg*100);
 
 % The best solution and the error are returned.
 Solution.best_estimate(simul,:)=bestmem(2:(D+1));
