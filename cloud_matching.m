@@ -1,45 +1,90 @@
 clc
 clear
-% Nubes para obtener scanmatching
-nube1 = pcread('scanm1.pcd');    
-nube2 = pcread('scanm2.pcd');
 
-%Nubes para fusionar
-nube3 = pcread('roi1.pcd');    
-nube4 = pcread('roi2.pcd');
+path='/home/jcl/Matlab2017b/DE_cylinder_modelling';
+holes_dir=dir([path '/*.pcd']);
+holes=size(holes_dir,1)/6
+TRs=[];
+TTs=[];
 
-%Plot
-figure(1)
-pcshow(nube1)
-  xlabel('X')
-  ylabel('Y')
-  zlabel('Z')
-hold on 
-pcshow(nube2)
+% Dibujar nubes para obtener scanmatching
+for i=1:holes
+    
+cloudfileroi=strcat('rest', num2str(i));
+cloudfileroi=strcat(cloudfileroi, '.pcd');
+
+figure(10)
+nube = pcread(cloudfileroi);
+pcshow(nube, 'MarkerSize', 25)
   xlabel('X')
   ylabel('Y')
   zlabel('Z')
 hold on 
 title('Scan matching clouds')
+end
 
-%Filtrado y conversión nubes
-scan_new=cloudfilter(nube1);
-scan_ant=cloudfilter(nube2);
-hole_new=cloudfilter(nube1);
-hole_ant=cloudfilter(nube2);
+nubescan = pcread('rest1.pcd');
+nubehole = pcread('roi1.pcd');
+scanref=cloudfilter(nubescan);
+holeref=cloudfilter(nubehole);
+result=holeref';
+
+for i=2:holes
+ 
+%Filtrado y conversión nubes    
+cloudfileroi=strcat('rest', num2str(i));
+cloudfileroi=strcat(cloudfileroi, '.pcd');
+nubescan = pcread(cloudfileroi);
+scan=cloudfilter(nubescan);
+
+cloudfilehole=strcat('roi', num2str(i));
+cloudfilehole=strcat(cloudfilehole, '.pcd');
+nubehole = pcread(cloudfilehole);
+hole=cloudfilter(nubehole);
 
 %ICP scan matching
-[TR, TT, dataOut] = icp(scan_ant,scan_new);   % dataOut=TR*nube_new+TT
+[TR, TT, dataOut] = icp(scanref,scan);   % dataOut=TR*nube_new+TT
+%TS(i)=[TR TT];
+TRs=[TRs;TR]
+TTs=[TTs TT]
+tfs=size(TTs,2);
 
-pts=size(hole_new,2);
-for i=1:1:pts
-    point=hole_new(:,i);
-    new_points(:,i)=TR*point+TT;
-end    
-
-
+%Drawing scan matching
 figure(2)
-plot3(hole_ant(1,:),hole_ant(2,:),hole_ant(3,:),'r.',new_points(1,:),new_points(2,:),new_points(3,:),'g.'), hold on, axis equal
- plot3([1 1 0],[0 1 1],[0 0 0],'r-',[1 1],[1 1],[0 1],'r-','LineWidth',2)
-title('Transformed data points (green) and model points (red)')
+clf
+plot3(scanref(1,:),scanref(2,:),scanref(3,:),'r.',dataOut(1,:),dataOut(2,:),dataOut(3,:),'g.'), hold on, axis equal
+plot3([1 1 0],[0 1 1],[0 0 0],'r-',[1 1],[1 1],[0 1],'r-','LineWidth',2)
+titulo=strcat('Transformed data points', num2str(i));
+titulo=strcat(titulo, '(green) and model points (red)');
+title(titulo)
 
+scanref=scan;
+holeref=hole;
+
+
+%TR and TT application
+pts=size(hole,2);
+for j=1:1:pts
+    point=hole(:,j);
+    for t=1:1:tfs
+       point=TRs(3*(tfs-t+1)-2:3*(tfs-t+1),:)*point+TTs(:,tfs-t+1); 
+    end    
+    new_points(:,j)=point;
+end
+
+result=[result;new_points'];
+%Plot conversion
+mergedcloud = pointCloud(result);
+k = waitforbuttonpress
+
+end
+
+figure(3)
+title('Merged Holes')
+pcshow(mergedcloud)
+  xlabel('X')
+  ylabel('Y')
+  zlabel('Z')
+hold on 
+
+[Cilindro]=modelling(mergedcloud);

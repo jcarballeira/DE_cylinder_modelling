@@ -4,7 +4,7 @@ clc
 
 path='/home/jcl/Matlab2017b/DE_cylinder_modelling';
 holes_dir=dir([path '/*.pcd']);
-holes=size(holes_dir,1)
+holes=size(holes_dir,1)/6
 
 %Plot each hole cloud
 for i=1:holes
